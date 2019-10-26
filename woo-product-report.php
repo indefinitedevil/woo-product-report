@@ -29,49 +29,52 @@ class Woo_Product_Report {
         global $plugin_page;
         $products = array_map([self::class, 'get_product_option'], self::get_products());
 ?>
-<form action="" method="get">
-    <input name="page" type="hidden" value="<?php echo $plugin_page; ?>"/>
-    <label for="product">Select a product</label>
-    <select id="product" name="product"><option/><?php echo implode('', $products); ?></select>
-    <button type="submit">View</button>
-</form>
-<script type="text/javascript">jQuery('#product').selectWoo();</script>
-<hr/>
-<table class="wp-list-table widefat striped">
-<thead>
-    <tr>
-        <th><?php _e('Order', 'woo_product_report'); ?></th>
-        <th><?php _e('Date', 'woo_product_report'); ?></th>
-        <th><?php _e('Status', 'woo_product_report'); ?></th>
-        <th><?php _e('Name', 'woo_product_report'); ?></th>
-        <th><?php _e('Qty', 'woo_product_report'); ?></th>
-        <th><?php _e('Notes', 'woo_product_report'); ?></th>
-    </tr>
-</thead>
-<tbody>
-<?php
-$orders = self::get_orders_from_product($_REQUEST['product'] ?? '');
-if (count($orders)): ?>
-    <?php foreach ($orders as $orderId): ?>
-        <?php $order = wc_get_order($orderId); ?>
-        <?php foreach ($order->get_items() as $orderItem): ?>
-    <tr>
-        <td>#<?php echo $order->get_order_number(); ?></td>
-        <td><?php echo ($order->get_date_completed()?: $order->get_date_created())->format('d/m/Y H:i:s'); ?></td>
-        <td><?php echo wc_get_order_status_name($order->get_status()); ?></td>
-        <td><?php echo $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(); ?></td>
-        <td><?php echo $orderItem->get_quantity(); ?></td>
-        <td><?php echo $order->get_customer_note(); ?></td>
-    </tr>
+<div class="wrap">
+    <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+    <form action="admin.php" method="get">
+        <input name="page" type="hidden" value="<?php echo $plugin_page; ?>"/>
+        <label for="product">Select a product</label>
+        <select id="product" name="product"><option/><?php echo implode('', $products); ?></select>
+        <button type="submit">View</button>
+    </form>
+    <script type="text/javascript">jQuery('#product').selectWoo();</script>
+    <hr/>
+    <table class="wp-list-table widefat striped">
+    <thead>
+        <tr>
+            <th><?php _e('Order', 'woo_product_report'); ?></th>
+            <th><?php _e('Date', 'woo_product_report'); ?></th>
+            <th><?php _e('Status', 'woo_product_report'); ?></th>
+            <th><?php _e('Name', 'woo_product_report'); ?></th>
+            <th><?php _e('Qty', 'woo_product_report'); ?></th>
+            <th><?php _e('Notes', 'woo_product_report'); ?></th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php
+    $orders = self::get_orders_from_product($_REQUEST['product'] ?? '');
+    if (count($orders)): ?>
+        <?php foreach ($orders as $orderId): ?>
+            <?php $order = wc_get_order($orderId); ?>
+            <?php foreach ($order->get_items() as $orderItem): ?>
+        <tr>
+            <td>#<?php echo $order->get_order_number(); ?></td>
+            <td><?php echo ($order->get_date_completed()?: $order->get_date_created())->format('d/m/Y H:i:s'); ?></td>
+            <td><?php echo wc_get_order_status_name($order->get_status()); ?></td>
+            <td><?php echo $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(); ?></td>
+            <td><?php echo $orderItem->get_quantity(); ?></td>
+            <td><?php echo $order->get_customer_note(); ?></td>
+        </tr>
+            <?php endforeach; ?>
         <?php endforeach; ?>
-    <?php endforeach; ?>
-<?php else: ?>
-    <tr>
-        <td colspan="6"><?php _e('No orders for this product', 'woo_product_report'); ?></td>
-    </tr>
-<?php endif; ?>
-</tbody>
-</table>
+    <?php else: ?>
+        <tr>
+            <td colspan="6"><?php _e('No orders for this product', 'woo_product_report'); ?></td>
+        </tr>
+    <?php endif; ?>
+    </tbody>
+    </table>
+</div>
 <?php
     }
 
