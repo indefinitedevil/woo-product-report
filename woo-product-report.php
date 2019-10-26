@@ -52,7 +52,8 @@ class Woo_Product_Report {
 <?php
 $orders = self::get_orders_from_product($_REQUEST['product'] ?? '');
 if (count($orders)): ?>
-    <?php foreach ($orders as $order): ?>
+    <?php foreach ($orders as $orderId): ?>
+        <?php $order = wc_get_order($orderId); ?>
         <?php foreach ($order->get_items() as $orderItem): ?>
     <tr>
         <td>#<?php echo $order->get_order_number(); ?></td>
@@ -104,6 +105,24 @@ if (count($orders)): ?>
 
     public static function get_orders_from_product($product_id = null) {
         if ($product_id) {
+            global $wpdb;
+
+            // Define HERE the orders status to include in  <==  <==  <==  <==  <==  <==  <==
+            $orders_statuses = "'wc-completed', 'wc-processing', 'wc-on-hold'";
+
+            # Get All defined statuses Orders IDs for a defined product ID (or variation ID)
+            return $wpdb->get_col( "
+                SELECT DISTINCT woi.order_id
+                FROM {$wpdb->prefix}woocommerce_order_itemmeta as woim, 
+                     {$wpdb->prefix}woocommerce_order_items as woi, 
+                     {$wpdb->prefix}posts as p
+                WHERE  woi.order_item_id = woim.order_item_id
+                AND woi.order_id = p.ID
+                AND p.post_status IN ( $orders_statuses )
+                AND woim.meta_key IN ( '_product_id', '_variation_id' )
+                AND woim.meta_value LIKE '$product_id'
+                ORDER BY woi.order_item_id DESC"
+            );
         }
         return [];
     }
