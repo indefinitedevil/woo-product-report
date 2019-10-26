@@ -57,7 +57,7 @@ if (count($orders)): ?>
         <?php foreach ($order->get_items() as $orderItem): ?>
     <tr>
         <td>#<?php echo $order->get_order_number(); ?></td>
-        <td><?php echo ($order->is_paid() ? $order->get_date_completed() : $order->get_date_created())->format('d/m/Y H:i:s'); ?></td>
+        <td><?php echo ($order->get_date_completed()?: $order->get_date_created())->format('d/m/Y H:i:s'); ?></td>
         <td><?php echo wc_get_order_status_name($order->get_status()); ?></td>
         <td><?php echo $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(); ?></td>
         <td><?php echo $orderItem->get_quantity(); ?></td>
